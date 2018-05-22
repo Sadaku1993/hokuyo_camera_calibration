@@ -1,3 +1,17 @@
+/*
+Calibration test (realsense and urg)
+
+Subscribe:
+    Camera Info
+    Camera Image
+    Laser PointCloud2
+    TF
+
+Publish:
+    coloring PointCloud2
+
+author:Yudai Sadakuni
+*/
 
 #include <ros/ros.h>
 #include "ros/package.h"
