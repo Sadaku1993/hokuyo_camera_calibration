@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <launch>
-    <node pkg="tf" type="static_transform_publisher" name="laser_camera" args="0.10 0.10 -0.10 0 0 0 laser camera_link 10"/>
+    <node pkg="tf" type="static_transform_publisher" name="laser_camera" args="0.05 0.02 -0.05 0 0 0 laser camera_link 10"/>
 </launch>

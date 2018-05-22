@@ -24,6 +24,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   tf
   visualization_msgs
+  jsk_recognition_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -129,7 +130,7 @@ include_directories(${Eigen_INCLUDE_DIRS})
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+  INCLUDE_DIRS include
 #  LIBRARIES hokuyo_camera_calibration
 #  CATKIN_DEPENDS amsl_recog_msgs cv_bridge image_geometry image_transport laser_geometry message_generation nav_msgs pcl_ros roscpp rospy sensor_msgs ssd_ros_msgs std_msgs tf visualization_msgs
 #  DEPENDS system_lib
@@ -142,7 +143,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+ include
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -161,10 +162,11 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(sub_data src/sub_data.cpp)
 add_executable(realsense_urg_10 src/realsense_urg_10.cpp)
-add_executable(hokuyo_clustering src/hokuyo_clustering.cpp)
+add_executable(hokuyo_clustering_old src/hokuyo_clustering_old.cpp)
 add_executable(hokuyo_scan2points src/hokuyo_scan2points.cpp)
 add_executable(ssd_human_for_hokuyo src/ssd_human_for_hokuyo.cpp)
-
+add_executable(hokuyo_pointcloud_transform src/hokuyo_pointcloud_transform.cpp)
+add_executable(hokuyo_clustering src/hokuyo_clustering.cpp)
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -186,7 +188,7 @@ target_link_libraries(realsense_urg_10
   ${OpenCV_LIBRARIES}
   ${PCL_LIBRARIES}
 )
-target_link_libraries(hokuyo_clustering
+target_link_libraries(hokuyo_clustering_old
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
   ${PCL_LIBRARIES}
@@ -201,6 +203,17 @@ target_link_libraries(ssd_human_for_hokuyo
   ${OpenCV_LIBRARIES}
   ${PCL_LIBRARIES}
 )
+target_link_libraries(hokuyo_pointcloud_transform
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+  ${PCL_LIBRARIES}
+)
+target_link_libraries(hokuyo_clustering
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+  ${PCL_LIBRARIES}
+)
+
 
 #############
 ## Install ##
