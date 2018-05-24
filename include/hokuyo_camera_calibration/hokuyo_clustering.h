@@ -25,7 +25,7 @@ using namespace Eigen;
 
 bool flag = false;
 
-typedef pcl::PointNormal PointA;
+typedef pcl::PointXYZ PointA;
 typedef pcl::PointCloud<PointA> CloudA;
 typedef pcl::PointCloud<PointA>::Ptr CloudAPtr;
 
@@ -38,7 +38,6 @@ struct Cluster{
     float height;
     float depth;
 
-    float curvature;
 
     Vector3f min_p;
     Vector3f max_p;
@@ -61,7 +60,6 @@ void getClusterInfo(CloudA pt, Cluster& cluster, PointA& point)
 	max_p[1]=pt.points[0].y;
 	max_p[2]=pt.points[0].z;
 
-    float curvature=pt.points[0].curvature;
 	
 	for(size_t i=1;i<pt.points.size();i++){
         centroid[0]+=pt.points[i].x;
@@ -75,7 +73,6 @@ void getClusterInfo(CloudA pt, Cluster& cluster, PointA& point)
 		if (pt.points[i].y>max_p[1]) max_p[1]=pt.points[i].y;
 		if (pt.points[i].z>max_p[2]) max_p[2]=pt.points[i].z;
 
-        curvature+=pt.points[i].curvature;
     }
     
 	cluster.x=centroid[0]/(float)pt.points.size();
@@ -84,7 +81,6 @@ void getClusterInfo(CloudA pt, Cluster& cluster, PointA& point)
     cluster.depth  = max_p[0]-min_p[0];
     cluster.width  = max_p[1]-min_p[1];
     cluster.height = max_p[2]-min_p[2]; 
-    cluster.curvature = curvature/(float)pt.points.size();
     cluster.min_p = min_p;
     cluster.max_p = max_p;
 
@@ -149,7 +145,6 @@ void clustering(CloudAPtr cloud,
         data.width = cluster.width;
         data.height = cluster.height;
         data.depth = cluster.depth;
-        data.curvature = cluster.curvature;
 
         sensor_msgs::PointCloud2 pc2_cloud;
         toROSMsg(*cloud_cluster, pc2_cloud);

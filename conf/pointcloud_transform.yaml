@@ -1,0 +1,3 @@
+pointcloud_transform:
+    target_frame: camera_color_optical_frame
+    source_frame: laser

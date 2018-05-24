@@ -77,15 +77,15 @@ void pcCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
 
 int main(int argc, char**argv)
 {
-    ros::init(argc, argv, "hokuyo_clustering_tf");
+    ros::init(argc, argv, "hokuyo_clustering");
     ros::NodeHandle n;
 
-    ros::Subscriber sub =  n.subscribe("/laser/tf", 10, pcCallback);
+    ros::Subscriber sub =  n.subscribe("/cloud", 10, pcCallback);
 
-    pub_bbox = n.advertise<jsk_recognition_msgs::BoundingBoxArray>("/laser/tf/bbox", 10);
-    pub_cluster = n.advertise<amsl_recog_msgs::ObjectInfoArray>("/laser//tf/cluster", 10);
-    pub_centroid = n.advertise<sensor_msgs::PointCloud2>("/laser/tf/centroid", 1);
-    pub_points = n.advertise<sensor_msgs::PointCloud2>("/laser/tf/points", 1);
+    pub_bbox = n.advertise<jsk_recognition_msgs::BoundingBoxArray>("/cloud/bbox", 10);
+    pub_cluster = n.advertise<amsl_recog_msgs::ObjectInfoArray>("/cloud/cluster", 10);
+    pub_centroid = n.advertise<sensor_msgs::PointCloud2>("/cloud/centroid", 1);
+    pub_points = n.advertise<sensor_msgs::PointCloud2>("/cloud/points", 1);
     ros::spin();
 
     return 0;

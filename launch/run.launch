@@ -1,22 +1,35 @@
 <?xml version="1.0"?>
 <launch>
     <!--Launch Sensor Node-->
-    <include file="$(realsense2_camera)/launch/rs_camera.launch" />
-    <include file="$(urg_node)/launch/urg_221.launch"/>
+    <include file="$(find realsense2_camera)/launch/pointcloud.launch" />
+    <include file="$(find urg_node)/launch/urg_221.launch"/>
 
     <!--Launch Sensor TF-->
-
-    <include file="$(hokuyo_camera_calibration)/launch/hokuyo_realsense.launch"/>
+    <include file="$(find hokuyo_camera_calibration)/launch/hokuyo_realsence.launch"/>
 
     <!--convert data from scan to pointcloud2-->
     <node pkg="hokuyo_camera_calibration" type="hokuyo_scan2points" name="scan2poitns"/>
 
     <!--Transform PointCloud2 data at Camera Link-->
-    <node pkg="hokuyo_camera_calibration" type="hokuyo_pointcloud_transform" name="pointcloud_transform" />
-        <param name="TARGET_FRAME"      value="/camera_point_optical_frame"/>
-        <param name="SOURCE_FRAME"      value="/laser"/>
-        <param name="SUBSCRIBE_TOPIC"   value="/eth_221/cloud"/>
-        <param name="PUBLISH_TOPIC"      valee="/eth_221/cloud/tf"/>
+    <rosparam command="load" file="$(find hokuyo_camera_calibration)/conf/pointcloud_transform.yaml"/>
+    <node pkg="hokuyo_camera_calibration" type="hokuyo_pointcloud_transform" name="pointcloud_transform">
+        <remap from="cloud"    to="/eth_221/cloud" />
+        <remap from="cloud/tf" to="/eth_221/cloud/tf" />
     </node>
 
+    <!--Single Shot MultiBox Detector-->
+    <node pkg="ssd_ros" type="ssd_realsense.py" name="ssd_realsense"/>
+
+    <!--Clustering-->
+    <node pkg="hokuyo_camera_calibration" type="hokuyo_clustering" name="clustering">
+        <remap from="cloud"             to="/eth_221/cloud/tf" />
+        <remap from="cloud/bbox"        to="/cloud/tf/bbox" />
+        <remap from="cloud/cluster"     to="/cloud/tf/cluster" />
+        <remap from="cloud/centroid"    to="/cloud/tf/centroid" />
+        <remap from="cloud/points"      to="/cloud/tf/points" />
+    </node>
+
+    <!--Fusion Data-->
+    <rosparam command="load" file="$(find hokuyo_camera_calibration)/conf/ssd_human.yaml"/>
+    <node pkg="hokuyo_camera_calibration" type="ssd_human_for_hokuyo" name="ssd_human" output="screen"/>
 </launch>

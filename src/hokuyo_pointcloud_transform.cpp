@@ -9,6 +9,7 @@ velodyne座標系の点群をzed座標系に変換
 #include <ros/ros.h>
 #include "ros/package.h"
 
+#include <std_msgs/String.h>
 #include <sensor_msgs/PointCloud.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/point_cloud_conversion.h>
@@ -21,19 +22,8 @@ using namespace std;
 ros::Publisher pub;
 ros::Time t;
 
-string TARGET_FRAME = "/camera";
-string SOURCE_FRAME = "/laser";
-string SUBSCRIBE_TOPIC ="/cloud";
-string PUBLISH_TOPIC = "/cloud_tf";
-
-// Load Parameter
-void getParams(ros::NodeHandle &n)
-{
-    n.getParam("TARGET_FRAME", TARGET_FRAME);
-    n.getParam("SOURCE_FRAME", SOURCE_FRAME);
-    n.getParam("SOUSCRINE_TOPIC", SUBSCRIBE_TOPIC);
-    n.getParam("PUBLISH_TOPIC", PUBLISH_TOPIC);
-}
+string TARGET_FRAME;
+string SOURCE_FRAME;
 
 sensor_msgs::PointCloud pc_;
 void pcCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
@@ -46,12 +36,16 @@ int main(int argc,char** argv)
 {
     ros::init(argc, argv, "hokuyo_pointcloud_transform");
     ros::NodeHandle n;
-    getParams(n);
+
+    //Load Params
+	n.getParam("/pointcloud_transform/target_frame", TARGET_FRAME);
+    n.getParam("/pointcloud_transform/source_frame", SOURCE_FRAME);
+
     tf::TransformListener listener;
     tf::StampedTransform transform;
 
-    ros::Subscriber pc_sub    = n.subscribe(SUBSCRIBE_TOPIC,10,pcCallback);
-    pub = n.advertise<sensor_msgs::PointCloud2>(PUBLISH_TOPIC, 10);
+    ros::Subscriber pc_sub    = n.subscribe("cloud",10,pcCallback);
+    pub = n.advertise<sensor_msgs::PointCloud2>("cloud/tf", 10);
     ros::Rate rate(20);
 
     while(ros::ok())

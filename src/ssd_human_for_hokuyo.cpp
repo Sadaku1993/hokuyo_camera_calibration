@@ -12,11 +12,16 @@
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/PointCloud.h>
 #include <sensor_msgs/point_cloud_conversion.h>
-#include <ssd_ros_msgs/BoundingBox.h>
-#include <ssd_ros_msgs/BoundingBoxArray.h>
-#include <ssd_ros_msgs/SSD.h>
+
+#include <amsl_recog_msgs/ObjectInfoWithROI.h>
+#include <amsl_recog_msgs/ObjectInfoArray.h>
+
 #include <map>
 #include <sensor_msgs/image_encodings.h>
+
+#include <diagnostic_msgs/DiagnosticArray.h>
+#include <diagnostic_msgs/DiagnosticStatus.h>
+#include <diagnostic_msgs/KeyValue.h>
 
 using namespace std;
 
@@ -24,21 +29,31 @@ typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloudXYZRGB;
 
 ros::Publisher pub_person;
 ros::Publisher pub_people;
+ros::Publisher pub_diagnostic;
 ros::Time t;
 
-string target_frame = "/camera";
-string source_frame = "/laser";
+// Sensor Frame
+string TARGET_FRAME;
+string SOURCE_FRAME;
+// Subscribe Topic
+string LASER_TOPIC;
+string IMAGE_TOPIC;
+string CAMERA_INFO;
+string BBOX_TOPIC;
+// Publish Topic
+string OUTPUT_CLOUD;
+string OUTPUT_BBOX;
+string DIAGNOSTIC;
 
 bool pc_flag = false;
 bool camera_flag = false;
 bool image_flag = false;
 bool boxes_flag = false;
 
-sensor_msgs::PointCloud pc_;
+sensor_msgs::PointCloud2ConstPtr pc2_;
 void pcCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
 {
-    sensor_msgs::convertPointCloud2ToPointCloud(*msg, pc_);
-    t = msg->header.stamp;
+    pc2_ = msg;
     pc_flag = true;
 }
 
@@ -56,8 +71,8 @@ void imageCallback(const sensor_msgs::ImageConstPtr& msg)
     image_flag = true;
 }
 
-ssd_ros_msgs::BoundingBoxArrayConstPtr boxes_;
-void boundingboxCallback(const ssd_ros_msgs::BoundingBoxArrayConstPtr& msg)
+amsl_recog_msgs::ObjectInfoArrayConstPtr boxes_;
+void boundingboxCallback(const amsl_recog_msgs::ObjectInfoArrayConstPtr& msg)
 {
     boxes_ = msg;
     boxes_flag = true;
@@ -68,37 +83,45 @@ int main(int argc, char**argv)
     ros::init(argc, argv, "ssd_human_for_hokuyo");
     ros::NodeHandle n;
 
-    tf::TransformListener listener;
-    tf::StampedTransform transform;
+    n.getParam("/ssd_human/target_frame",   TARGET_FRAME );
+    n.getParam("/ssd_human/source_frame",   SOURCE_FRAME );
+    n.getParam("/ssd_human/laser_topic",    LASER_TOPIC );
+    n.getParam("/ssd_human/image_topic",    IMAGE_TOPIC );
+    n.getParam("/ssd_human/camera_info",    CAMERA_INFO );
+    n.getParam("/ssd_human/bbox_topic",     BBOX_TOPIC );
+    n.getParam("/ssd_human/output_cloud",   OUTPUT_CLOUD );
+    n.getParam("/ssd_human/output_bbox",    OUTPUT_BBOX );
+    n.getParam("/ssd_human/diagnostic",     DIAGNOSTIC);
 
-    //ros::Subscriber pc_sub    = n.subscribe("/velodyne_points",10,pcCallback);
-    // 三分割したvelodyneの点群をsubscribe
-    ros::Subscriber pc_sub    = n.subscribe("/eth221/cloud",10,pcCallback);
-    ros::Subscriber cinfo_sub = n.subscribe("/camera/color/camera_info",10,cameraCallback);
-    ros::Subscriber image_sub = n.subscribe("/camera/color/image_raw",10,imageCallback);
-    ros::Subscriber box_sub   = n.subscribe("/realsense/ssd/BoxArray",10,boundingboxCallback);
+    ros::Subscriber pc_sub    = n.subscribe(LASER_TOPIC,10,pcCallback);
+    ros::Subscriber cinfo_sub = n.subscribe(CAMERA_INFO,10,cameraCallback);
+    ros::Subscriber image_sub = n.subscribe(IMAGE_TOPIC,10,imageCallback);
+    ros::Subscriber box_sub   = n.subscribe(BBOX_TOPIC,10,boundingboxCallback);
  
-    pub_person  = n.advertise<sensor_msgs::PointCloud2> ("SSD/person",10);
-    pub_people = n.advertise<ssd_ros_msgs::SSD> ("SSD/people",1000);
+    pub_person  = n.advertise<sensor_msgs::PointCloud2> (OUTPUT_CLOUD,10);
+    pub_people = n.advertise<amsl_recog_msgs::ObjectInfoArray> (OUTPUT_BBOX,10);
+    pub_diagnostic = n.advertise<diagnostic_msgs::DiagnosticArray> (DIAGNOSTIC, 10);
 
     ros::Rate rate(20);
 
+    diagnostic_msgs::DiagnosticArray diagnostic;
+    diagnostic_msgs::DiagnosticStatus status;
+    status.level = 3;
+    status.name = "Human Detection Using LiDAR Clustering and Camera Recognition";
+    status.message = "Subscribe Data";
+    diagnostic.status.push_back(status);
+
     while(ros::ok())
     {
-        sensor_msgs::PointCloud pc_trans;
-        sensor_msgs::PointCloud2 pc2_trans;
-        try{
-            listener.waitForTransform(target_frame.c_str(), source_frame.c_str(), t, ros::Duration(10.0));
-            listener.transformPointCloud(target_frame.c_str(), t, pc_, source_frame.c_str(), pc_trans);
-            sensor_msgs::convertPointCloudToPointCloud2(pc_trans, pc2_trans);
-        }catch (tf::TransformException& ex) {
-            ROS_WARN("[draw_frames] TF exception:\n%s", ex.what());
-        }
-
         if(pc_flag && camera_flag && image_flag && boxes_flag){
-            printf("ALL GREEN\n");
+            diagnostic.status[0].level=0;
             // human_detection(pc2_trans, camera_, image_, boxes_);
         }
+        else{
+             diagnostic.status[0].level=1;
+        }
+        
+        pub_diagnostic.publish(diagnostic);
 
         ros::spinOnce();
         rate.sleep();
