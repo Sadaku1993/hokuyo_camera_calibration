@@ -1,5 +1,9 @@
 <?xml version="1.0"?>
 <launch>
+    <!--Launch Sensor Node-->
+    <include file="$(realsense2_camera)/launch/rs_camera.launch" />
+    <include file="$(urg_node)/launch/urg_221.launch"/>
+
     <!--convert data from scan to pointcloud2-->
     <node pkg="hokuyo_camera_calibration" type="hokuyo_scan2points" name="scan2poitns"/>
 
@@ -8,6 +12,6 @@
         <param name="TARGET_FRAME"      value="/camera_point_optical_frame"/>
         <param name="SOURCE_FRAME"      value="/laser"/>
         <param name="SUBSCRIBE_TOPIC"   value="/eth_221/cloud"/>
-        <param name="OUTPUT_TOPIC"      valee="/eth_221/cloud/tf"/>
+        <param name="PUBLISH_TOPIC"      valee="/eth_221/cloud/tf"/>
     </node>
 </launch>
