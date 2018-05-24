@@ -18,34 +18,6 @@ author : Yudai Sadakuni
 
 #include <hokuyo_camera_calibration/ssd_human.h>
 
-sensor_msgs::PointCloud2ConstPtr pc2_;
-void pcCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
-{
-    pc2_ = msg;
-    pc_flag = true;
-}
-
-sensor_msgs::CameraInfoConstPtr camera_;
-void cameraCallback(const sensor_msgs::CameraInfoConstPtr& msg)
-{
-    camera_ = msg;
-    camera_flag = true;
-}
-
-sensor_msgs::ImageConstPtr image_;
-void imageCallback(const sensor_msgs::ImageConstPtr& msg)
-{
-    image_ = msg;
-    image_flag = true;
-}
-
-amsl_recog_msgs::ObjectInfoArrayConstPtr boxes_;
-void boundingboxCallback(const amsl_recog_msgs::ObjectInfoArrayConstPtr& msg)
-{
-    boxes_ = msg;
-    boxes_flag = true;
-}
-
 int main(int argc, char**argv)
 {
     ros::init(argc, argv, "ssd_human_for_hokuyo");
