@@ -1,54 +1,22 @@
-#include <ros/ros.h>
-#include "ros/package.h"
-#include <tf/tf.h>
-#include <tf/transform_listener.h>
-#include <pcl/point_cloud.h>
-#include <pcl_conversions/pcl_conversions.h>
-#include <pcl/common/transforms.h>
-#include <pcl_ros/transforms.h>
-#include <opencv2/opencv.hpp>
-#include <cv_bridge/cv_bridge.h>
-#include <image_geometry/pinhole_camera_model.h>
-#include <sensor_msgs/CameraInfo.h>
-#include <sensor_msgs/PointCloud.h>
-#include <sensor_msgs/point_cloud_conversion.h>
+/*
 
-#include <amsl_recog_msgs/ObjectInfoWithROI.h>
-#include <amsl_recog_msgs/ObjectInfoArray.h>
+Calcrate Human Position Using LiDAR Clustering and Camera Recognition
 
-#include <map>
-#include <sensor_msgs/image_encodings.h>
+Publish
+    OUTPUT_CLOUD : visualize
+    OUTPUT_BBOX  : amsl_recog_msgs::BoundingBoxArray
+    DIAGNOSTIC   : Check Error
+Subscribe
+    INPUT_CLOUD : lidar points
+    CAMERA_INFO : camera info
+    INPUT_IMAGE : camera image 
+    INPUT_BBOX  : SSD  
 
-#include <diagnostic_msgs/DiagnosticArray.h>
-#include <diagnostic_msgs/DiagnosticStatus.h>
-#include <diagnostic_msgs/KeyValue.h>
+author : Yudai Sadakuni
 
-using namespace std;
+*/
 
-typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloudXYZRGB;
-
-ros::Publisher pub_person;
-ros::Publisher pub_people;
-ros::Publisher pub_diagnostic;
-ros::Time t;
-
-// Sensor Frame
-string TARGET_FRAME;
-string SOURCE_FRAME;
-// Subscribe Topic
-string LASER_TOPIC;
-string IMAGE_TOPIC;
-string CAMERA_INFO;
-string BBOX_TOPIC;
-// Publish Topic
-string OUTPUT_CLOUD;
-string OUTPUT_BBOX;
-string DIAGNOSTIC;
-
-bool pc_flag = false;
-bool camera_flag = false;
-bool image_flag = false;
-bool boxes_flag = false;
+#include <hokuyo_camera_calibration/ssd_human.h>
 
 sensor_msgs::PointCloud2ConstPtr pc2_;
 void pcCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
