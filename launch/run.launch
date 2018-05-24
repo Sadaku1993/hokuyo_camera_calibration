@@ -4,6 +4,10 @@
     <include file="$(realsense2_camera)/launch/rs_camera.launch" />
     <include file="$(urg_node)/launch/urg_221.launch"/>
 
+    <!--Launch Sensor TF-->
+
+    <include file="$(hokuyo_camera_calibration)/launch/hokuyo_realsense.launch"/>
+
     <!--convert data from scan to pointcloud2-->
     <node pkg="hokuyo_camera_calibration" type="hokuyo_scan2points" name="scan2poitns"/>
 
