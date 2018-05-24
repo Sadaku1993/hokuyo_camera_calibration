@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+    <!--convert data from scan to pointcloud2-->
+    <node pkg="hokuyo_camera_calibration" type="hokuyo_scan2points" name="scan2poitns"/>
+
+    <!--Transform PointCloud2 data at Camera Link-->
+    <node pkg="hokuyo_camera_calibration" type="hokuyo_pointcloud_transform" name="pointcloud_transform" />
+        <param name="TARGET_FRAME"      value="/camera_point_optical_frame"/>
+        <param name="SOURCE_FRAME"      value="/laser"/>
+        <param name="SUBSCRIBE_TOPIC"   value="/eth_221/cloud"/>
+        <param name="OUTPUT_TOPIC"      valee="/eth_221/cloud/tf"/>
+    </node>
+</launch>
