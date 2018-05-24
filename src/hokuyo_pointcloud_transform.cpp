@@ -21,9 +21,19 @@ using namespace std;
 ros::Publisher pub;
 ros::Time t;
 
-string target_frame = "/camera_color_optical_frame";
-string source_frame = "/laser";
+string TARGET_FRAME = "/camera";
+string SOURCE_FRAME = "/laser";
+string SUBSCRIBE_TOPIC ="/cloud";
+string PUBLISH_TOPIC = "/cloud_tf";
 
+// Load Parameter
+void getParams(ros::NodeHandle &n)
+{
+    n.getParam("TARGET_FRAME", TARGET_FRAME);
+    n.getParam("SOURCE_FRAME", SOURCE_FRAME);
+    n.getParam("SOUSCRINE_TOPIC", SUBSCRIBE_TOPIC);
+    n.getParam("PUBLISH_TOPIC", PUBLISH_TOPIC);
+}
 
 sensor_msgs::PointCloud pc_;
 void pcCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
@@ -36,11 +46,12 @@ int main(int argc,char** argv)
 {
     ros::init(argc, argv, "hokuyo_pointcloud_transform");
     ros::NodeHandle n;
+    getParams(n);
     tf::TransformListener listener;
     tf::StampedTransform transform;
 
-    ros::Subscriber pc_sub    = n.subscribe("/eth_221/cloud",10,pcCallback);
-    pub = n.advertise<sensor_msgs::PointCloud2>("/eth_221/cloud/tf", 10);
+    ros::Subscriber pc_sub    = n.subscribe(SUBSCRIBE_TOPIC,10,pcCallback);
+    pub = n.advertise<sensor_msgs::PointCloud2>(PUBLISH_TOPIC, 10);
     ros::Rate rate(20);
 
     while(ros::ok())
@@ -48,8 +59,8 @@ int main(int argc,char** argv)
         sensor_msgs::PointCloud pc_trans;
         sensor_msgs::PointCloud2 pc2_trans;
         try{
-            listener.waitForTransform(target_frame.c_str(), source_frame.c_str(), t, ros::Duration(1.0));
-            listener.transformPointCloud(target_frame.c_str(), t, pc_, source_frame.c_str(), pc_trans);
+            listener.waitForTransform(TARGET_FRAME.c_str(), SOURCE_FRAME.c_str(), t, ros::Duration(1.0));
+            listener.transformPointCloud(TARGET_FRAME.c_str(), t, pc_, SOURCE_FRAME.c_str(), pc_trans);
             sensor_msgs::convertPointCloudToPointCloud2(pc_trans, pc2_trans);
         }catch (tf::TransformException& ex) {
             ROS_WARN("[draw_frames] TF exception:\n%s", ex.what());
