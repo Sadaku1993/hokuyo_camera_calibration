@@ -21,7 +21,7 @@
     <node pkg="ssd_ros" type="ssd_realsense.py" name="ssd_realsense"/>
 
     <!--Clustering-->
-    <node pkg="hokuyo_camera_calibration" type="hokuyo_clustering" name="clustering">
+    <node pkg="hokuyo_camera_calibration" type="hokuyo_clustering" name="clustering" output="screen">
         <remap from="cloud"             to="/eth_221/cloud/tf" />
         <remap from="cloud/bbox"        to="/cloud/tf/bbox" />
         <remap from="cloud/cluster"     to="/cloud/tf/cluster" />
@@ -31,5 +31,5 @@
 
     <!--Fusion Data-->
     <rosparam command="load" file="$(find hokuyo_camera_calibration)/conf/ssd_human.yaml"/>
-    <node pkg="hokuyo_camera_calibration" type="ssd_human_for_hokuyo" name="ssd_human" output="screen"/>
+    <node pkg="hokuyo_camera_calibration" type="ssd_human_for_hokuyo" name="ssd_human"/>
 </launch>

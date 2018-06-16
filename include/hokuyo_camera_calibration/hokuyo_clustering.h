@@ -93,6 +93,7 @@ void clustering(CloudAPtr cloud,
                 CloudA& cluster_centroid, 
                 CloudA& cluster_points, 
                 amsl_recog_msgs::ObjectInfoArray& cluster_array,
+                jsk_recognition_msgs::BoundingBoxArray& bbox_array,
                 std::string target_frame)
 {
 	//Clustering//
@@ -109,6 +110,9 @@ void clustering(CloudAPtr cloud,
 	ec.extract (cluster_indices);
 
     printf("cluster num:%d\n", int(cluster_indices.size()));
+
+    bbox_array.header.frame_id = target_frame;
+    bbox_array.header.stamp = ros::Time::now();
 
     // get cluster infomation
     size_t num = 0;
@@ -132,7 +136,7 @@ void clustering(CloudAPtr cloud,
         // for amsl_recog_msgs
         amsl_recog_msgs::ObjectInfoWithROI data;
 
-        data.header.frame_id = "camera_color_optical_frame";
+        data.header.frame_id = target_frame;
         data.header.stamp = ros::Time::now();
 
         data.pose.position.x = cluster.x;
@@ -154,6 +158,25 @@ void clustering(CloudAPtr cloud,
         data.points = pc2_cloud;
 
         cluster_array.object_array.push_back(data);
+
+
+        // for jsk recognition msgs
+        jsk_recognition_msgs::BoundingBox bbox;
+        
+        bbox.header.frame_id = target_frame;
+        bbox.header.stamp = ros::Time::now();
+        bbox.pose.position.x = cluster.x;
+        bbox.pose.position.y = cluster.y;
+        bbox.pose.position.z = cluster.z;
+        bbox.pose.orientation.x = 0;
+        bbox.pose.orientation.y = 0;
+        bbox.pose.orientation.z = 0;
+        bbox.pose.orientation.w = 1;
+        bbox.dimensions.x = cluster.width;
+        bbox.dimensions.y = cluster.height;
+        bbox.dimensions.z = cluster.depth;
+        bbox.value = iii;
+        bbox_array.boxes.push_back(bbox);
     }
 }
 

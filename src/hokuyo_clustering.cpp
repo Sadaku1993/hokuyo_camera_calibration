@@ -40,33 +40,19 @@ void pcCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
     
     CloudA cluster_centroid;
     CloudA cluster_points;
-    amsl_recog_msgs::ObjectInfoArray cluster_array;
     std::string target_frame = msg->header.frame_id;
+    amsl_recog_msgs::ObjectInfoArray cluster_array;
+    jsk_recognition_msgs::BoundingBoxArray bbox_array;
+
     clustering(cloud, 
                cluster_centroid,
                cluster_points,
                cluster_array,
+               bbox_array,
                target_frame);
 
-    jsk_recognition_msgs::BoundingBoxArray bbox_array;
-    bbox_array.header.frame_id = target_frame;
-    bbox_array.header.stamp = ros::Time::now();
+    cout<<bbox_array<<endl;
 
-    int cluster_size = int(cluster_array.object_array.size());
-
-    printf("BBox num:%d¥n", cluster_size);
-
-    for(int i=0;i<cluster_size;i++){
-        jsk_recognition_msgs::BoundingBox bbox;
-        bbox.header.frame_id = target_frame;
-        bbox.header.stamp = ros::Time::now();
-        bbox.pose = cluster_array.object_array[i].pose;
-        bbox.dimensions.x = cluster_array.object_array[i].depth;
-        bbox.dimensions.y = cluster_array.object_array[i].width;
-        bbox.dimensions.z = cluster_array.object_array[i].height;
-        bbox.value = i;
-        bbox_array.boxes.push_back(bbox);
-    }
     pub_bbox.publish(bbox_array);
     pub_cluster.publish(cluster_array);
 

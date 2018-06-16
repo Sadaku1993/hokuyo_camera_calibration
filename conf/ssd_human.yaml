@@ -1,12 +1,12 @@
 ssd_human:
     # Sensor Frame
-    target_frame: camera_color_optical_frame
+    target_frame: camera_link
     source_frame: laser
     # Subscribe Topic
-    laser_topic: /eth_221/cloud/tf
     image_topic: /camera/color/image_raw
     camera_info: /camera/color/camera_info
-    bbox_topic:  /cloud/tf/cluster
+    laser_cluster: /cloud/tf/cluster
+    camera_cluster: /realsense/ssd/BoxArray
     # Publish Topic
     output_cloud: /SSD/person
     output_bbox: /SSD/people 
