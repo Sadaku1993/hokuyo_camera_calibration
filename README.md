@@ -25,9 +25,9 @@ By integrating the data of 2D-LiDAR and camera, recgnize human position.
 
 ## How to Build
 
-###Install [realsense](http://wiki.ros.org/realsense_camera)
+### Install [realsense](http://wiki.ros.org/realsense_camera)
 
-###Install [urg_node](http://wiki.ros.org/urg_node)
+### Install [urg_node](http://wiki.ros.org/urg_node)
 
 ```
 $cd $HOME
