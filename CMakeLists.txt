@@ -74,11 +74,11 @@ include_directories(${Eigen_INCLUDE_DIRS})
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+  FILES
+  Cluster.msg
+  ClusterArray.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -95,10 +95,12 @@ include_directories(${Eigen_INCLUDE_DIRS})
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
+generate_messages(
+  DEPENDENCIES
+  sensor_msgs
+  std_msgs
 #   amsl_recog_msgs#   nav_msgs#   sensor_msgs#   ssd_ros_msgs#   std_msgs#   visualization_msgs
-# )
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -132,7 +134,7 @@ include_directories(${Eigen_INCLUDE_DIRS})
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES hokuyo_camera_calibration
-#  CATKIN_DEPENDS amsl_recog_msgs cv_bridge image_geometry image_transport laser_geometry message_generation nav_msgs pcl_ros roscpp rospy sensor_msgs ssd_ros_msgs std_msgs tf visualization_msgs
+  CATKIN_DEPENDS amsl_recog_msgs cv_bridge image_geometry image_transport laser_geometry message_generation nav_msgs pcl_ros roscpp rospy sensor_msgs ssd_ros_msgs std_msgs tf visualization_msgs
 #  DEPENDS system_lib
 )
 

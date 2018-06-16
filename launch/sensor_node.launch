@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+    <!--Launch Sensor Node-->
+    <include file="$(find realsense2_camera)/launch/pointcloud.launch" />
+    <include file="$(find urg_node)/launch/urg_221.launch"/>
+
+    <!--Launch Sensor TF-->
+    <include file="$(find hokuyo_camera_calibration)/launch/hokuyo_realsence.launch"/>
+
+    <!--convert data from scan to pointcloud2-->
+    <node pkg="hokuyo_camera_calibration" type="hokuyo_scan2points" name="scan2poitns"/>
+
+    <!--Transform PointCloud2 data at Camera Link-->
+    <rosparam command="load" file="$(find hokuyo_camera_calibration)/conf/pointcloud_transform.yaml"/>
+    <node pkg="hokuyo_camera_calibration" type="hokuyo_pointcloud_transform" name="pointcloud_transform">
+        <remap from="cloud"    to="/eth_221/cloud" />
+        <remap from="cloud/tf" to="/eth_221/cloud/tf" />
+    </node>
+</launch>

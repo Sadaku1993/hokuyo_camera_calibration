@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+    <!--Single Shot MultiBox Detector-->
+    <node pkg="ssd_ros" type="ssd_realsense.py" name="ssd_realsense"/>
+
+    <!--Clustering-->
+    <node pkg="hokuyo_camera_calibration" type="hokuyo_clustering" name="clustering" output="screen">
+        <remap from="cloud"             to="/eth_221/cloud/tf" />
+        <remap from="cloud/bbox"        to="/cloud/tf/bbox" />
+        <remap from="cloud/cluster"     to="/cloud/tf/cluster" />
+        <remap from="cloud/centroid"    to="/cloud/tf/centroid" />
+        <remap from="cloud/points"      to="/cloud/tf/points" />
+    </node>
+</launch>
