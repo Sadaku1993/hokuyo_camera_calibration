@@ -21,5 +21,5 @@ gnome-terminal -e "/opt/ros/kinetic/bin/rosbag play /home/amsl/bagfiles/hokuyo_c
 sleep 1s
 
 # rviz
-gnome-terminal -e '/opt/ros/kinetic/bin/rosrun rviz rviz -d /home/amsl/.rviz/hokuyo_camera_calibration.rviz' --geometry=50x12+2000+750 &
+gnome-terminal -e '/opt/ros/kinetic/bin/rosrun rviz rviz -d /home/amsl/.rviz/hokuyo_camera_object_detection.rviz' --geometry=50x12+2000+750 &
 sleep 1s

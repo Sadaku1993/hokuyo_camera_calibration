@@ -169,6 +169,7 @@ add_executable(hokuyo_scan2points src/hokuyo_scan2points.cpp)
 add_executable(ssd_human_for_hokuyo src/ssd_human_for_hokuyo.cpp)
 add_executable(hokuyo_pointcloud_transform src/hokuyo_pointcloud_transform.cpp)
 add_executable(hokuyo_clustering src/hokuyo_clustering.cpp)
+add_executable(jsk_bbox_test src/jsk_bbox_test.cpp)
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -215,6 +216,13 @@ target_link_libraries(hokuyo_clustering
   ${OpenCV_LIBRARIES}
   ${PCL_LIBRARIES}
 )
+target_link_libraries(jsk_bbox_test
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+  ${PCL_LIBRARIES}
+)
+
+
 
 
 #############
