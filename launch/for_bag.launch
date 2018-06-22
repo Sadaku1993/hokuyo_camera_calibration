@@ -4,11 +4,21 @@
     <node pkg="ssd_ros" type="ssd_realsense.py" name="ssd_realsense"/>
 
     <!--Clustering-->
-    <node pkg="hokuyo_camera_calibration" type="hokuyo_clustering" name="clustering" output="screen">
+    <node pkg="hokuyo_camera_calibration" type="hokuyo_clustering" name="clustering">
         <remap from="cloud"             to="/eth_221/cloud/tf" />
         <remap from="cloud/bbox"        to="/cloud/tf/bbox" />
         <remap from="cloud/cluster"     to="/cloud/tf/cluster" />
         <remap from="cloud/centroid"    to="/cloud/tf/centroid" />
         <remap from="cloud/points"      to="/cloud/tf/points" />
     </node>
+
+    <!--Fusion Data-->
+    <node pkg="hokuyo_camera_calibration" type="ssd_cluster_integration" name="integration" output="screen">
+        <remap from="image"         to="/camera/color/image_raw" />
+        <remap from="camera_info"   to="/camera/color/camera_info" />
+        <remap from="cluster"       to="/cloud/tf/cluster" />
+        <remap from="ssd"           to="/realsense/ssd/BoxArray" />
+        <remap from="image_output"  to="/integration"  />
+    </node>
+
 </launch>

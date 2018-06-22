@@ -25,6 +25,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   visualization_msgs
   jsk_recognition_msgs
+  message_filters
 )
 
 ## System dependencies are found with CMake's conventions
@@ -170,6 +171,7 @@ add_executable(ssd_human_for_hokuyo src/ssd_human_for_hokuyo.cpp)
 add_executable(hokuyo_pointcloud_transform src/hokuyo_pointcloud_transform.cpp)
 add_executable(hokuyo_clustering src/hokuyo_clustering.cpp)
 add_executable(jsk_bbox_test src/jsk_bbox_test.cpp)
+add_executable(ssd_cluster_integration src/ssd_cluster_integration.cpp)
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -221,6 +223,12 @@ target_link_libraries(jsk_bbox_test
   ${OpenCV_LIBRARIES}
   ${PCL_LIBRARIES}
 )
+target_link_libraries(ssd_cluster_integration
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+  ${PCL_LIBRARIES}
+)
+
 
 
 

@@ -30,6 +30,13 @@
     </node>
 
     <!--Fusion Data-->
-    <rosparam command="load" file="$(find hokuyo_camera_calibration)/conf/ssd_human.yaml"/>
-    <node pkg="hokuyo_camera_calibration" type="ssd_human_for_hokuyo" name="ssd_human"/>
+    <!--rosparam command="load" file="$(find hokuyo_camera_calibration)/conf/ssd_human.yaml"/>
+    <node pkg="hokuyo_camera_calibration" type="ssd_human_for_hokuyo" name="ssd_human"/-->
+    <node pkg="hokuyo_camera_calibration" type="ssd_cluster_integration" name="integration" >
+        <remap from="image"         to="/camera/color/image_raw" />
+        <remap from="camera_info"   to="/camera/color/camera_info" />
+        <remap from="cluster"       to="/cloud/tf/cluster" />
+        <remap from="ssd"           to="/realsense/ssd/BoxArray" />
+        <remap from="image_output"  to="/integration"  />
+    </node>
 </launch>

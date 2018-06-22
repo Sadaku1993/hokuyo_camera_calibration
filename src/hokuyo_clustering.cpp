@@ -55,16 +55,19 @@ void pcCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
     jsk_recognition_msgs::BoundingBoxArray bbox_array;
     
     // for amsl_recog_msgs
+    ros::Time t_ = ros::Time::now();
+    object_array.header.frame_id = msg->header.frame_id;
+    object_array.header.stamp = t_;
     for(size_t i=0;i<cluster_array.size();i++)
     {
         sensor_msgs::PointCloud2 pc2_cloud;
         toROSMsg(cluster_array[i].points, pc2_cloud);
         pc2_cloud.header.frame_id = target_frame;
-        pc2_cloud.header.stamp = ros::Time::now();
+        pc2_cloud.header.stamp = t_;
         
         amsl_recog_msgs::ObjectInfoWithROI data;
         data.header.frame_id    = target_frame;
-        data.header.stamp = ros::Time::now();
+        data.header.stamp = t_;
         data.pose.position.x = cluster_array[i].data.x;
         data.pose.position.y = cluster_array[i].data.y;
         data.pose.position.z = cluster_array[i].data.z;
@@ -109,6 +112,7 @@ void pcCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
 
         bbox_array.boxes.push_back(bbox);
     }
+
 
     pub_cluster.publish(object_array);
     pub_bbox.publish(bbox_array);
