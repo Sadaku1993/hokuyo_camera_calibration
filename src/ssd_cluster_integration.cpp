@@ -27,15 +27,32 @@ void callback(const ImageConstPtr &image_msg,
 
     // ROI(pointcloud clustering)
     roi_for_cluster(cluster_msg, cam_model_, cluster_roi, image);
-    int cluster_pick_up = int(cluster_roi.object_array.size());
     
     // ROI(object detector)
     roi_for_bbox(ssd_msg, bbox_roi, image);
-    int bbox_pick_up    = int(bbox_roi.object_array.size()); 
 
     // ROI(sensor fusion)
     roi_for_fusion(bbox_roi, cluster_roi, detect_roi, image);
-    int detect_pick_up = int(detect_roi.object_array.size());
+
+    ros::Time t = ros::Time::now();
+    jsk_recognition_msgs::BoundingBoxArray object_array;
+    object_array.header.frame_id = cluster_msg->header.frame_id;
+    object_array.header.stamp = t;
+    for(size_t i=0;i<detect_roi.object_array.size();i++){
+        jsk_recognition_msgs::BoundingBox bbox;
+        bbox.header.frame_id = cluster_msg->header.frame_id;
+        bbox.header.stamp = t;
+        bbox.pose.position = detect_roi.object_array[i].pose.position;
+        bbox.pose.orientation.x = 0;
+        bbox.pose.orientation.y = 0;
+        bbox.pose.orientation.z = 0;
+        bbox.pose.orientation.w = 1;
+        bbox.dimensions.x = detect_roi.object_array[i].depth;
+        bbox.dimensions.y = detect_roi.object_array[i].width;
+        bbox.dimensions.z = 0.01;
+        object_array.boxes.push_back(bbox);
+    }
+    pub.publish(object_array);
 
 	sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
 	image_pub.publish(msg);
@@ -60,6 +77,7 @@ int main(int argc, char**argv)
 	sync.registerCallback(boost::bind(&callback, _1, _2, _3, _4));
 
 
+    pub = nh.advertise<jsk_recognition_msgs::BoundingBoxArray>("/bbox_output", 10);
 	image_pub = it.advertise("/image_output", 10);
 
     ros::spin();

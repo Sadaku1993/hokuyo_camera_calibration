@@ -18,6 +18,9 @@
 #include <amsl_recog_msgs/ObjectInfoWithROI.h>
 #include <amsl_recog_msgs/ObjectInfoArray.h>
 
+#include <jsk_recognition_msgs/BoundingBox.h>
+#include <jsk_recognition_msgs/BoundingBoxArray.h>
+
 using namespace std;
 using namespace Eigen;
 using namespace sensor_msgs;
@@ -147,19 +150,20 @@ void roi_for_fusion(const ObjectInfoArray bbox_roi,
     cout<<"SSD"<<endl;
     for(int i=0;i<bbox_size;i++){
         ObjectInfoWithROI bbox = bbox_roi.object_array[i];
-        printf("offset_x:%5d offset_y:%5d width:%5d height:%5d\n",
-                bbox.roi.x_offset, bbox.roi.y_offset, bbox.roi.width, bbox.roi.height);
+        printf("Num:%d offset_x:%5d offset_y:%5d width:%5d height:%5d\n",
+                i, bbox.roi.x_offset, bbox.roi.y_offset, bbox.roi.width, bbox.roi.height);
     }
     cout<<"Cluster"<<endl;
     for(int i=0;i<cluster_size;i++){
         ObjectInfoWithROI cluster = cluster_roi.object_array[i];
-        printf("offset_x:%5d offset_y:%5d width:%5d height:%5d\n",
-                cluster.roi.x_offset, cluster.roi.y_offset, cluster.roi.width, cluster.roi.height);
+        printf("Num:%d offset_x:%5d offset_y:%5d width:%5d height:%5d\n",
+                i, cluster.roi.x_offset, cluster.roi.y_offset, cluster.roi.width, cluster.roi.height);
     }
 
     if(0<bbox_size && 0<cluster_size)
     {
         // SSD と ClusterのBoundingBoxの重なり具合(iou)を算出
+        cout<<"IOU"<<endl;
         Data data[bbox_size][cluster_size];
         for(int i=0;i<bbox_size;i++){
             for(int j=0;j<cluster_size;j++){
@@ -208,9 +212,10 @@ void roi_for_fusion(const ObjectInfoArray bbox_roi,
         }
 
         // IOU値が閾値以上のSSDとClusterを取得
+        cout<<"RESULT"<<endl;
         for(int i=0;i<bbox_size;i++){
-            int j = id_sata[i];
-            if(0.3 < data[i][j].iou){
+            int j = id_data[i];
+            if(0.7 < data[i][j].iou){
                 ObjectInfoWithROI roi;
                 // object detection data
                 roi.Class       = bbox_roi.object_array[i].Class;
@@ -231,11 +236,13 @@ void roi_for_fusion(const ObjectInfoArray bbox_roi,
                 roi.points    = cluster_roi.object_array[j].points;
                 detect_roi.object_array.push_back(roi);
                 // Show Result
-                printf("i:%d j:%d x:%.2f y:%.2f z:%.2f\n", 
-                        i, j, roi.pose.position.x, roi.pose.position.y, roi.pose.position.z);
+                printf("i:%d j:%d x:%.2f y:%.2f z:%.2f iou:%.2f\n", 
+                        i, j, roi.pose.position.x, roi.pose.position.y, roi.pose.position.z, data[i][j].iou);
             }
         }
-
+        cout<<""<<endl;
+        
+        int detect_size = int(detect_roi.object_array.size());
         for(int i=0;i<detect_size ;i++){
             int xmin = detect_roi.object_array[i].xmin;
             int ymin = detect_roi.object_array[i].ymin;
