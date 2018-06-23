@@ -11,7 +11,6 @@ By integrating the data of 2D-LiDAR and camera, recgnize human position.
 - [Opencv3](https://opencv.org/)
 - [PCL1.8](https://pointcloud.org/)
 - [realsense_camera](http://wiki.ros.org/realsense_camera)
-- [urg_node](http://wiki.ros.org/urg_node)
 
 ## Hardware Spec
 - PC
@@ -34,4 +33,7 @@ $catkin_make
 ```
 
 ## How to run
-
+```
+$roscd hokuyo_camera_clibration/launch
+$roslaunch hokuyo_camera_calibration run.launch
+```
