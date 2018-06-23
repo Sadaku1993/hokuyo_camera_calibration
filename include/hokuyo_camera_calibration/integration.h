@@ -159,8 +159,8 @@ void roi_for_fusion(const ObjectInfoArray bbox_roi,
 
     if(0<bbox_size && 0<cluster_size)
     {
+        // SSD と ClusterのBoundingBoxの重なり具合(iou)を算出
         Data data[bbox_size][cluster_size];
-
         for(int i=0;i<bbox_size;i++){
             for(int j=0;j<cluster_size;j++){
                 ObjectInfoWithROI bbox    = bbox_roi.object_array[i];
@@ -192,9 +192,9 @@ void roi_for_fusion(const ObjectInfoArray bbox_roi,
                 data[i][j].iou = iou;
             }
         }
- 
+        
+        // SSD BoundingBoxに対してiou値が最も大きなCluster BoundingBoxを算出
         int id_data[bbox_size] = {};
-
         for(int i=0;i<bbox_size;i++){
             int max_id=0;
             float max_iou=data[i][0].iou;
@@ -205,6 +205,43 @@ void roi_for_fusion(const ObjectInfoArray bbox_roi,
                     id_data[i] = max_id;
                 }
             }
+        }
+
+        // IOU値が閾値以上のSSDとClusterを取得
+        for(int i=0;i<bbox_size;i++){
+            int j = id_sata[i];
+            if(0.3 < data[i][j].iou){
+                ObjectInfoWithROI roi;
+                // object detection data
+                roi.Class       = bbox_roi.object_array[i].Class;
+                roi.probability = bbox_roi.object_array[i].probability;
+                // overlap area
+                roi.xmin = data[i][j].overlap.x;
+                roi.ymin = data[i][j].overlap.y;
+                roi.xmax = data[i][j].overlap.x + data[i][j].overlap.width;
+                roi.ymax = data[i][j].overlap.y + data[i][j].overlap.height;
+                // pointcloud cluster data
+                roi.roi       = cluster_roi.object_array[j].roi;
+                roi.pose      = cluster_roi.object_array[j].pose;
+                roi.width     = cluster_roi.object_array[j].width;
+                // roi.height=0になるからjsk_recognitionを使う時には1以上にするように
+                roi.height    = cluster_roi.object_array[j].height;
+                roi.depth     = cluster_roi.object_array[j].depth;
+                // roi.curvature = cluster_roi.object_array[j].curvature; 
+                roi.points    = cluster_roi.object_array[j].points;
+                detect_roi.object_array.push_back(roi);
+                // Show Result
+                printf("i:%d j:%d x:%.2f y:%.2f z:%.2f\n", 
+                        i, j, roi.pose.position.x, roi.pose.position.y, roi.pose.position.z);
+            }
+        }
+
+        for(int i=0;i<detect_size ;i++){
+            int xmin = detect_roi.object_array[i].xmin;
+            int ymin = detect_roi.object_array[i].ymin;
+            int xmax = detect_roi.object_array[i].xmax;
+            int ymax = detect_roi.object_array[i].ymax;
+            cv::rectangle(image, cv::Point(xmin, ymin), cv::Point(xmax, ymax), cv::Scalar(200,0,0), 3, 4);
         }
     }
 }
