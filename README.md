@@ -37,3 +37,5 @@ $catkin_make
 $roscd hokuyo_camera_clibration/launch
 $roslaunch hokuyo_camera_calibration run.launch
 ```
+
+![Result](integration0.png)
